@@ -56,5 +56,5 @@ poetry install --no-dev
 This project provides the following abilities:
  * Generate EDA report using pandas-profiler or sweetviz and save report on the local machine.
     ```sh
-    poetry run generate-eda --profiler <pandas-profiler or sweetviz>
+    poetry run generate-eda --profiler <pandas-profiler or sweetviz> -- --dataset-path <path to csv file> --report-path <directory, to save report>
     ```
