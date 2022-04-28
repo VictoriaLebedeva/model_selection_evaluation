@@ -4,9 +4,9 @@
 This project uses [Forest Cover Type Prediction](https://www.kaggle.com/competitions/forest-cover-type-prediction/data) dataset.
 
 ## Project navigation
-* [Project structure](#link)
-* [Configuring local enviroment](#link)
-* [Usage](#link)
+* [Project structure](https://github.com/VictoriaLebedeva/model_selection_evaluation#project-structure)
+* [Configuring local enviroment](https://github.com/VictoriaLebedeva/model_selection_evaluation#configuring-local-enviroment)
+* [Usage](https://github.com/VictoriaLebedeva/model_selection_evaluation#usage)
 
 
 ## Project structure
