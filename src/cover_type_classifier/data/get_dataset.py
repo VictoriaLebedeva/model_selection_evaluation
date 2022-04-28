@@ -11,8 +11,8 @@ def get_dataset(data_path, random_state, test_size):
     df = pd.read_csv(data_path)
     df.columns = df.columns.str.lower()
 
-    X = dataset.drop('cover_type', axis=1)
-    y = dataset['target']
+    X = df.drop('cover_type', axis=1)
+    y = df['cover_type']
     X_train, X_val, y_train, y_val = train_test_split(
         X, y, test_size=test_size, random_state=random_state
     )

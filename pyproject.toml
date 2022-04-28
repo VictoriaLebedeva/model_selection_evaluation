@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "09_model_selection_evaluation"
+name = "cover_type_classifier"
 version = "0.1.0"
 description = "Capstone project RS School ML Course 2022"
 authors = ["Victoria Lebedeva"]
@@ -19,7 +19,8 @@ black = "^22.3.0"
 flake8 = "^4.0.1"
 
 [tool.poetry.scripts]
-generate-eda = "src.09_model_selection_evaluation.data.generate_eda:generate_eda"
+generate-eda = "src.cover_type_classifier.data.generate_eda:generate_eda"
+knn-train = "src.cover_type_classifier.models.knn_train:train"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
