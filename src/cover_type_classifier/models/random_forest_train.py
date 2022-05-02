@@ -77,7 +77,7 @@ def train(dataset_path,
     print('Cross-Validation score results')
     for metric in metrics:
         print(f'{metric}:', cross_val_score(rf_clf, X_train_shuffled, y_train_shuffled, cv=5, scoring=metric))
-
+    
     y_pred = rf_clf.predict(X_test)
 
     # generate name of the output file

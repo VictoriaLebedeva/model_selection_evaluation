@@ -15,10 +15,12 @@ This project uses [Forest Cover Type Prediction](https://www.kaggle.com/competit
 |- notebooks                           <---- EDA and data and model researches                   
 │- src  
 │   └─ cover_type_classifier           <---- Source code for the project
-│       │- models                      <---- Scripts for training, tuning models, make predictions
-│       |   └─ ... (to be done)
+│       │- models                      <---- Scripts for training, tuning models, making predictions
+│       |   |- knn_train.py
+│       |   |- random_forest_train.py
 │       |- data                        <---- Scripts for data processing (EDA report)
-│       |   └─ ... (to be done)
+│       |   |- generate_eda.py
+│       |   |- get_dataset.py
 │       │- init.py                     <---- Makes src a Python module
 │- tests                               <---- Project tests
 |   │- ... (to be done)
@@ -56,5 +58,30 @@ poetry install --no-dev
 This project provides the following abilities:
  * Generate EDA report using pandas-profiler or sweetviz and save report on the local machine.
     ```sh
-    poetry run generate-eda --profiler <pandas-profiler or sweetviz> -- --dataset-path <path to csv file> --report-path <directory, to save report>
+    poetry run generate-eda --profiler <pandas-profiler or sweetviz> --dataset-path <path to csv file> --report-path <directory, to save report>
+    ```
+ * Train classifiers  
+   **NOTE (for reviewers)** Making predictions for data in test.csv takes much time, so in order to make homework check faster I added parameter **nrows**. It will allow to read only part of the data.
+
+   **kNN**
+   ```sh
+   poetry run knn-train \
+   --dataset-path <path to train data> \
+   --test-path <path to test data> \
+   --report-path <path,where to save predictions> \
+   --nrows <number of rows to read from file> \
+   --n-neighbors <knn param: number of neighbors> \
+   --weights <knn param: distance weights>
+    ```
+
+    **Random Forest**
+   ```sh
+   poetry run rf-train \
+   --dataset-path <path to train data> \
+   --test-path <path to test data> \
+   --report-path <path,where to save predictions> \
+   --nrows <number of rows to read from file> \
+   --max-features <random forest param: number of features, used in each tree> \
+   --n-estimators <random forest param: the number of trees in the forest> \
+   --min-samples-leaf <random forest param: minimum number of samples required to be at a leaf node>
     ```
