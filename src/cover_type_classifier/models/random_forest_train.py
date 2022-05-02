@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_score
 from sklearn.utils import shuffle
-# from cover_type_classifier.data import get_dataset  # return
+from cover_type_classifier.data import get_dataset
 from datetime import datetime
 
 
@@ -64,27 +64,11 @@ def train(dataset_path,
           n_estimators,
           min_samples_leaf):
 
-    # X_train, X_val, y_train, y_val = get_dataset.get_dataset(dataset_path, random_state, test_size) # return
-    # X_train, X_val, y_train, y_val = get_dataset.get_dataset(dataset_path, test_path, nrows) # return
-
-    # to be removed
-    from sklearn.model_selection import train_test_split
-
-    df_train = pd.read_csv(dataset_path, nrows=200)
-    df_train.columns = df_train.columns.str.lower()
-
-    X_train = df_train.drop('cover_type', axis=1)
-    y_train = df_train['cover_type']
-
-    X_test = pd.read_csv(test_path, nrows=100)
-    X_test.columns = X_test.columns.str.lower()
-
-    # to be removed
-
+    X_train, y_train, X_test = get_dataset.get_dataset(dataset_path, test_path, nrows)
     X_train_shuffled, y_train_shuffled = shuffle(X_train, y_train, random_state=42)
 
     # train model and make a prediction
-    rf_clf = RandomForestClassifier(n_estimators=n_estimators, max_features=max_features, )
+    rf_clf = RandomForestClassifier(n_estimators=n_estimators, max_features=max_features, min_samples_leaf=min_samples_leaf)
     print('Estimator', rf_clf)    
     rf_clf.fit(X_train, y_train)
 
@@ -105,6 +89,8 @@ def train(dataset_path,
     df = pd.DataFrame(X_test.index, columns=['Id'])
     df['Cover_Type'] = y_pred
     df.to_csv(output_path, index=False)
+
+    print(f'Model output was saved to {output_path}')
 
 
 if __name__ == '__main__':
