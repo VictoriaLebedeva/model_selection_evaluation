@@ -21,6 +21,7 @@ flake8 = "^4.0.1"
 [tool.poetry.scripts]
 generate-eda = "src.cover_type_classifier.data.generate_eda:generate_eda"
 knn-train = "src.cover_type_classifier.models.knn_train:train"
+rf-train = "src.cover_type_classifier.models.random_forest_train:train"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
