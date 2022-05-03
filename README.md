@@ -7,6 +7,7 @@ This project uses [Forest Cover Type Prediction](https://www.kaggle.com/competit
 * [Project structure](https://github.com/VictoriaLebedeva/model_selection_evaluation#project-structure)
 * [Configuring local enviroment](https://github.com/VictoriaLebedeva/model_selection_evaluation#configuring-local-enviroment)
 * [Usage](https://github.com/VictoriaLebedeva/model_selection_evaluation#usage)
+* [Development](https://github.com/VictoriaLebedeva/model_selection_evaluation#development)
 
 
 ## Project structure
@@ -87,4 +88,17 @@ This project provides the following abilities:
    --max-features <random forest param: number of features, used in each tree> \
    --n-estimators <random forest param: the number of trees in the forest> \
    --min-samples-leaf <random forest param: minimum number of samples required to be at a leaf node>
+    ```
+
+## Development
+
+* Formatting and linting project
+
+    To format the code, run the following command:
+   ```sh
+   poetry run black src
+    ```
+   And for linting code, use the command
+   ```sh
+   poetry run flake8
     ```
