@@ -58,7 +58,10 @@ poetry install --no-dev
 This project provides the following abilities:
  * Generate EDA report using pandas-profiler or sweetviz and save report on the local machine.
     ```sh
-    poetry run generate-eda --profiler <pandas-profiler or sweetviz> --dataset-path <path to csv file> --report-path <directory, to save report>
+    poetry run generate-eda \
+    --profiler <pandas-profiler or sweetviz> \
+    --dataset-path <path to csv file> \
+    --report-path <directory, to save report>
     ```
  * Train classifiers  
    **NOTE (for reviewers)** Making predictions for data in test.csv takes much time, so in order to make homework check faster I added parameter **nrows**. It will allow to read only part of the data.
