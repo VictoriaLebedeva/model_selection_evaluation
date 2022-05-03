@@ -95,13 +95,22 @@ This project provides the following abilities:
 
 * Formatting and linting project
 
-    To format the code, run the following command:
-   ```sh
-   poetry run black src
-    ```
-   And for linting code, use the command
-   ```sh
-   poetry run flake8
-    ```
+  To format the code, run the following command:
+  ```sh
+  poetry run black src
+  ```
+  And for linting code, use the command
+  ```sh
+  poetry run flake8
+  ```
   Then, you will get something like this:
   ![linting_code](assets/linting_done.png)
+
+* Checking type annotation
+
+  To check static type annotation, run the following command:
+   ```sh
+   poetry run mypy src
+    ```
+  If there are no errors, you will get the following report:
+  ![linting_code](assets/mypy_report.png)
