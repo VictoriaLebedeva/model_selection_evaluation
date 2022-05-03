@@ -12,6 +12,7 @@ This project uses [Forest Cover Type Prediction](https://www.kaggle.com/competit
 
 ## Project structure
 ```
+|- assets                              <---- Screenshots of the code check
 |- models                              <---- Models predictions
 |- notebooks                           <---- EDA and data and model researches                   
 │- src  
@@ -102,3 +103,5 @@ This project provides the following abilities:
    ```sh
    poetry run flake8
     ```
+  Then, you will get something like this:
+  ![linting_code](assets/linting_done.png)
