@@ -52,8 +52,13 @@ from datetime import datetime
     help="kNN model weights.",
 )
 def train(
-    dataset_path, test_path, prediction_path, nrows, n_neighbors, weights
-):
+    dataset_path: str,
+    test_path: str,
+    prediction_path: str,
+    nrows: int,
+    n_neighbors: int,
+    weights: str,
+) -> None:
 
     # get data
     X_train, y_train, X_test = get_dataset.get_dataset(

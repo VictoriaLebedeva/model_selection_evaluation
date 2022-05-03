@@ -57,14 +57,14 @@ from datetime import datetime
     help="The minimum number of samples required to be at a leaf node.",
 )
 def train(
-    dataset_path,
-    test_path,
-    prediction_path,
-    nrows,
-    max_features,
-    n_estimators,
-    min_samples_leaf,
-):
+    dataset_path: str,
+    test_path: str,
+    prediction_path: str,
+    nrows: int,
+    max_features: str,  # check this
+    n_estimators: int,
+    min_samples_leaf: int,
+) -> None:
 
     X_train, y_train, X_test = get_dataset.get_dataset(
         dataset_path, test_path, nrows

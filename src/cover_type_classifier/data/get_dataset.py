@@ -1,7 +1,10 @@
 import pandas as pd
+from typing import Tuple
 
 
-def get_dataset(data_path, test_path, nrows=None):
+def get_dataset(
+    data_path: str, test_path: str, nrows: int = None
+) -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame]:
     """
     Gets train and test data from csv file.
     """

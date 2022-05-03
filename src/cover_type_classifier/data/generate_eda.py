@@ -27,7 +27,7 @@ from datetime import datetime
     type=click.Path(exists=True, dir_okay=True),
     show_default=True,
 )
-def generate_eda(profiler, dataset_path, report_path):
+def generate_eda(profiler: str, dataset_path: str, report_path: str) -> None:
     """
     Generates EDA report and saves to the given directory.
 
