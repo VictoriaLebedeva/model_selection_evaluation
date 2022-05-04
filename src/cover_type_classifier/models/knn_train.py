@@ -15,14 +15,12 @@ from sklearn.model_selection import GridSearchCV
 from cover_type_classifier.data import get_dataset
 from cover_type_classifier.data import feature_engineering
 
-# mlflow experiment identifier
-mlflow_experiment_id = 1
-
 # model parameter grid
 param = {
-    'n_neighbors': np.array(1, 20, 1),
-    'weights': ["uniform", "distance"]
+    'n_neighbors': np.arange(1, 20, 1),
+    'weights': ["uniform", "distance"],
 }
+
 
 @click.command()
 @click.option(
@@ -99,16 +97,17 @@ def train(
     X_train, y_train = shuffle(X_train, y_train, random_state=42)
 
     if remove_irrelevant_features:
-        X_train = feature_engineering.remove_irrelevant_features(X_train, y_train)
-    
+        X_train = feature_engineering.remove_irrelevant_features(
+            X_train, y_train
+        )
+
     if min_max_scaler:
-        scaler = MinMaxScaler(feature_range=(0,1))
+        scaler = MinMaxScaler(feature_range=(0, 1))
         X_train = scaler.fit_transform(X_train)
 
-
     # train model and make a prediction
-    with mlflow.start_run(experiment_id=mlflow_experiment_id):
-        
+    with mlflow.start_run():
+
         # model initialization
         knn = KNeighborsClassifier(n_neighbors=n_neighbors, weights=weights)
         print("Estimator", knn)
@@ -116,15 +115,29 @@ def train(
 
         # cross-validation
         cv_inner = KFold(n_splits=3, shuffle=True, random_state=1)
-        search = GridSearchCV(knn, param, scoring='f1_weighted', n_jobs=1, cv=cv_inner, refit=True)
+        search = GridSearchCV(
+            knn,
+            param,
+            scoring='f1_weighted',
+            n_jobs=1,
+            cv=cv_inner,
+            refit=True,
+        )
         metrics = ["balanced_accuracy", "f1_weighted", "roc_auc_ovo"]
         print("Cross-Validation score results")
 
         cv_outer = KFold(n_splits=10, shuffle=True, random_state=1)
-        metrics_scores = {} 
+        metrics_scores = {}
 
         for metric in metrics:
-            scores = cross_val_score(search, X_train, y_train, scoring='f1_weighted', cv=cv_outer, n_jobs=-1)
+            scores = cross_val_score(
+                search,
+                X_train,
+                y_train,
+                scoring='f1_weighted',
+                cv=cv_outer,
+                n_jobs=None,
+            )
             metrics_scores[metric] = np.mean(scores)
             print(f"{metric}:", scores)
 

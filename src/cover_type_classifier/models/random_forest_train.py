@@ -14,7 +14,7 @@ from cover_type_classifier.data import get_dataset
 from cover_type_classifier.data import feature_engineering
 from datetime import datetime
 
-import mlflow 
+import mlflow
 
 mlflow_experiment_id = 2
 
@@ -22,8 +22,9 @@ mlflow_experiment_id = 2
 param = {
     'max_features': ['auto', 'sqrt', 'log2'],
     'n_estimators': np.array(10, 50, 10),
-    'min_samples_leaf': np.array(50, 300, 50)
+    'min_samples_leaf': np.array(50, 300, 50),
 }
+
 
 @click.command()
 @click.option(
@@ -105,33 +106,49 @@ def train(
     X_train, y_train = shuffle(X_train, y_train, random_state=42)
 
     if remove_irrelevant_features:
-        X_train = feature_engineering.remove_irrelevant_features(X_train, y_train)
-    
+        X_train = feature_engineering.remove_irrelevant_features(
+            X_train, y_train
+        )
+
     if min_max_scaler:
-        scaler = MinMaxScaler(feature_range=(0,1))
+        scaler = MinMaxScaler(feature_range=(0, 1))
         X_train = scaler.fit_transform(X_train)
 
     with mlflow.start_run(experiment_id=mlflow_experiment_id):
         rf_clf = RandomForestClassifier(
-        n_estimators=n_estimators,
-        max_features=max_features,
-        min_samples_leaf=min_samples_leaf,
-    )
+            n_estimators=n_estimators,
+            max_features=max_features,
+            min_samples_leaf=min_samples_leaf,
+        )
         print("Estimator", rf_clf)
         rf_clf.fit(X_train, y_train)
 
         # cross-validation
         cv_inner = KFold(n_splits=3, shuffle=True, random_state=1)
-        search = GridSearchCV(rf_clf, param, scoring='f1_weighted', n_jobs=1, cv=cv_inner, refit=True)
-    
+        search = GridSearchCV(
+            rf_clf,
+            param,
+            scoring='f1_weighted',
+            n_jobs=1,
+            cv=cv_inner,
+            refit=True,
+        )
+
         metrics = ["balanced_accuracy", "f1_weighted", "roc_auc_ovo"]
         print("Cross-Validation score results")
 
         cv_outer = KFold(n_splits=10, shuffle=True, random_state=1)
-        metrics_scores = {} 
+        metrics_scores = {}
 
         for metric in metrics:
-            scores = cross_val_score(search, X_train, y_train, scoring='f1_weighted', cv=cv_outer, n_jobs=-1)
+            scores = cross_val_score(
+                search,
+                X_train,
+                y_train,
+                scoring='f1_weighted',
+                cv=cv_outer,
+                n_jobs=-1,
+            )
             metrics_scores[metric] = np.mean(scores)
             print(f"{metric}:", scores)
 
@@ -140,7 +157,6 @@ def train(
         mlflow.log_param('min_samples_leaf', min_samples_leaf)
         mlflow.log_metric('f1_weighted', metrics_scores['f1_weighted'])
         mlflow.sklearn.log_model(rf_clf, 'model')
-
 
     y_pred = rf_clf.predict(X_test)
 

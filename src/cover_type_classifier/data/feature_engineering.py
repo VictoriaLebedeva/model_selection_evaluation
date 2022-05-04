@@ -5,8 +5,10 @@ from sklearn.feature_selection import SelectPercentile
 from sklearn.feature_selection import chi2, f_classif
 
 
-def remove_irrelevant_features(X_train: pd.DataFrame, y_train: pd.Series) -> np.ndarray:
-    """ Splits feature set into categorical and numeric and 
+def remove_irrelevant_features(
+    X_train: pd.DataFrame, y_train: pd.Series
+) -> np.ndarray:
+    """Splits feature set into categorical and numeric and
     return new feature set with the most relevant features.
     """
 
@@ -17,15 +19,18 @@ def remove_irrelevant_features(X_train: pd.DataFrame, y_train: pd.Series) -> np.
     # select best features among categorical
     chi2_selector = SelectPercentile(chi2, percentile=75)
     categorical_features = chi2_selector.fit_transform(
-        categorical_features, target)
+        categorical_features, target
+    )
 
     # select best features among numerical
     fvalue_selector = SelectPercentile(f_classif, percentile=75)
     numerical_features = fvalue_selector.fit_transform(
-        numerical_features, target)
+        numerical_features, target
+    )
 
     X_train_processed = np.concatenate(
-        (numerical_features, categorical_features), axis=1)
+        (numerical_features, categorical_features), axis=1
+    )
 
     print("Initial number of features:", X_train.shape[1])
     print("Reduced number of features:", X_train_processed.shape[1])
