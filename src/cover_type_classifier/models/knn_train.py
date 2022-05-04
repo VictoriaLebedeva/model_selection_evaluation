@@ -67,14 +67,14 @@ param = {
 )
 @click.option(
     "--min-max-scaler",
-    default=False,
+    default=True,
     type=bool,
     show_default=True,
     help="Use MinMaxScaler in data preprocessing.",
 )
 @click.option(
     "--remove-irrelevant-features",
-    default=False,
+    default=True,
     type=bool,
     show_default=True,
     help="Dimetion reduction by removing irrelevant features.",
@@ -114,39 +114,43 @@ def train(
         knn.fit(X_train, y_train)
 
         # cross-validation
-        cv_inner = KFold(n_splits=3, shuffle=True, random_state=1)
-        search = GridSearchCV(
-            knn,
-            param,
-            scoring='f1_weighted',
-            n_jobs=1,
-            cv=cv_inner,
-            refit=True,
-        )
+        # cv_inner = KFold(n_splits=3, shuffle=True, random_state=42)
+        # search = GridSearchCV(
+        #     knn,
+        #     param,
+        #     scoring='f1_weighted',
+        #     n_jobs=1,
+        #     cv=cv_inner,
+        #     refit=True,
+        # )
         metrics = ["balanced_accuracy", "f1_weighted", "roc_auc_ovo"]
         print("Cross-Validation score results")
 
-        cv_outer = KFold(n_splits=10, shuffle=True, random_state=1)
+        cv_outer = KFold(n_splits=10, shuffle=True, random_state=42)
         metrics_scores = {}
 
         for metric in metrics:
             scores = cross_val_score(
-                search,
+                knn,
                 X_train,
                 y_train,
-                scoring='f1_weighted',
+                scoring=metric,
                 cv=cv_outer,
                 n_jobs=None,
             )
             metrics_scores[metric] = np.mean(scores)
             print(f"{metric}:", scores)
 
-        mlflow.log_param('n_neighbors', n_neighbors)
-        mlflow.log_param('weights', weights)
-        mlflow.log_metric('f1_weighted', metrics_scores['f1_weighted'])
-        mlflow.sklearn.log_model(knn, 'model')
+        mlflow.log_param("n_neighbors", n_neighbors)
+        mlflow.log_param("weights", weights)
+        mlflow.log_param(
+            "remove_irrelevant_features", remove_irrelevant_features
+        )
+        mlflow.log_param("min_max_scaler", min_max_scaler)
+        mlflow.log_metric("f1_weighted", metrics_scores["f1_weighted"])
+        mlflow.sklearn.log_model(knn, "model")
 
-    y_pred = knn.predict(X_test)
+    # y_pred = knn.predict(X_test)
 
     # generate name of the output file
     now = datetime.now()
@@ -155,7 +159,7 @@ def train(
 
     # save prediction to csv
     df = pd.DataFrame(X_test.index, columns=["Id"])
-    df["Cover_Type"] = y_pred
+    # df["Cover_Type"] = y_pred
     df.to_csv(output_path, index=False)
     print(f"Model output was saved to {output_path}")
 

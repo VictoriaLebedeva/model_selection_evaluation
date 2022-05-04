@@ -65,8 +65,8 @@ This project provides the following abilities:
     --dataset-path <path to csv file> \
     --report-path <directory, to save report>
     ```
- * Train classifiers  
-   **NOTE (for reviewers)** Making predictions for data in test.csv takes much time, so in order to make homework check faster I added parameter **nrows**. It will allow to read only part of the data.
+ * **Train classifiers**  
+   **NOTE (for reviewers)** Making predictions for data in test.csv takes much time, so in order to make homework check faster I added parameter **nrows**. It will allow to read only part of the data. By default all row of the dataset will be read.
 
    **kNN**
    ```sh
@@ -90,6 +90,14 @@ This project provides the following abilities:
    --n-estimators <random forest param: the number of trees in the forest> \
    --min-samples-leaf <random forest param: minimum number of samples required to be at a leaf node>
     ```
+
+### **Experiments** 
+Manual parameter tuning experiments can be seen in MLFlow UI. Run MLFrow using the following command:
+ ```sh
+   poetry run mlflow ui
+```
+Then follow the link listed under **Listening at** (for example, http://<i></i>127.0.0.1:\<port\>). After clicking on the link you will see the scoreboard with the results of the experiments. For example, the following screenshot shows the results of the experiment with **kNN** and **Random Forest Classifier**.
+![mlflow_experiments](assets/mlflow_experiments.png)
 
 ## Development
 

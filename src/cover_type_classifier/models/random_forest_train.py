@@ -16,13 +16,12 @@ from datetime import datetime
 
 import mlflow
 
-mlflow_experiment_id = 2
 
 # model parameter grid
 param = {
     'max_features': ['auto', 'sqrt', 'log2'],
-    'n_estimators': np.array(10, 50, 10),
-    'min_samples_leaf': np.array(50, 300, 50),
+    'n_estimators': np.arange(10, 50, 10),
+    'min_samples_leaf': np.arange(50, 300, 50),
 }
 
 
@@ -114,7 +113,7 @@ def train(
         scaler = MinMaxScaler(feature_range=(0, 1))
         X_train = scaler.fit_transform(X_train)
 
-    with mlflow.start_run(experiment_id=mlflow_experiment_id):
+    with mlflow.start_run():
         rf_clf = RandomForestClassifier(
             n_estimators=n_estimators,
             max_features=max_features,
@@ -124,15 +123,15 @@ def train(
         rf_clf.fit(X_train, y_train)
 
         # cross-validation
-        cv_inner = KFold(n_splits=3, shuffle=True, random_state=1)
-        search = GridSearchCV(
-            rf_clf,
-            param,
-            scoring='f1_weighted',
-            n_jobs=1,
-            cv=cv_inner,
-            refit=True,
-        )
+        # cv_inner = KFold(n_splits=3, shuffle=True, random_state=1)
+        # search = GridSearchCV(
+        #     rf_clf,
+        #     param,
+        #     scoring='f1_weighted',
+        #     n_jobs=1,
+        #     cv=cv_inner,
+        #     refit=True,
+        # )
 
         metrics = ["balanced_accuracy", "f1_weighted", "roc_auc_ovo"]
         print("Cross-Validation score results")
@@ -142,12 +141,11 @@ def train(
 
         for metric in metrics:
             scores = cross_val_score(
-                search,
+                rf_clf,
                 X_train,
                 y_train,
                 scoring='f1_weighted',
-                cv=cv_outer,
-                n_jobs=-1,
+                cv=cv_outer
             )
             metrics_scores[metric] = np.mean(scores)
             print(f"{metric}:", scores)
@@ -155,20 +153,23 @@ def train(
         mlflow.log_param('n_estimators', n_estimators)
         mlflow.log_param('max_features', max_features)
         mlflow.log_param('min_samples_leaf', min_samples_leaf)
+        mlflow.log_param(
+            "remove_irrelevant_features", remove_irrelevant_features
+        )
+        mlflow.log_param("min_max_scaler", min_max_scaler)
         mlflow.log_metric('f1_weighted', metrics_scores['f1_weighted'])
         mlflow.sklearn.log_model(rf_clf, 'model')
 
-    y_pred = rf_clf.predict(X_test)
+    # y_pred = rf_clf.predict(X_test)
 
     # generate name of the output file
     now = datetime.now()
-    report_filename = f"""prediction_random_forest_
-                    {now.strftime("%d%m%Y_%H%M%S")}.csv"""
+    report_filename = f'prediction_rf_{now.strftime("%d%m%Y_%H%M%S")}.csv'
     output_path = os.path.join(prediction_path, report_filename)
 
     # save prediction to csv
     df = pd.DataFrame(X_test.index, columns=["Id"])
-    df["Cover_Type"] = y_pred
+    # df["Cover_Type"] = y_pred
     df.to_csv(output_path, index=False)
 
     print(f"Model output was saved to {output_path}")

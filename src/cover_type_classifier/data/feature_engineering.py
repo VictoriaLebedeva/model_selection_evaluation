@@ -19,13 +19,13 @@ def remove_irrelevant_features(
     # select best features among categorical
     chi2_selector = SelectPercentile(chi2, percentile=75)
     categorical_features = chi2_selector.fit_transform(
-        categorical_features, target
+        categorical_features, y_train
     )
 
     # select best features among numerical
     fvalue_selector = SelectPercentile(f_classif, percentile=75)
     numerical_features = fvalue_selector.fit_transform(
-        numerical_features, target
+        numerical_features, y_train
     )
 
     X_train_processed = np.concatenate(
