@@ -19,9 +19,9 @@ import mlflow
 
 # model parameter grid
 param = {
-    'max_features': ['auto', 'sqrt', 'log2'],
-    'n_estimators': np.arange(10, 50, 10),
-    'min_samples_leaf': np.arange(50, 300, 50),
+    "max_features": ["auto", "sqrt", "log2"],
+    "n_estimators": np.arange(10, 50, 10),
+    "min_samples_leaf": np.arange(50, 300, 50),
 }
 
 
@@ -141,24 +141,20 @@ def train(
 
         for metric in metrics:
             scores = cross_val_score(
-                rf_clf,
-                X_train,
-                y_train,
-                scoring='f1_weighted',
-                cv=cv_outer
+                rf_clf, X_train, y_train, scoring="f1_weighted", cv=cv_outer
             )
             metrics_scores[metric] = np.mean(scores)
             print(f"{metric}:", scores)
 
-        mlflow.log_param('n_estimators', n_estimators)
-        mlflow.log_param('max_features', max_features)
-        mlflow.log_param('min_samples_leaf', min_samples_leaf)
+        mlflow.log_param("n_estimators", n_estimators)
+        mlflow.log_param("max_features", max_features)
+        mlflow.log_param("min_samples_leaf", min_samples_leaf)
         mlflow.log_param(
             "remove_irrelevant_features", remove_irrelevant_features
         )
         mlflow.log_param("min_max_scaler", min_max_scaler)
-        mlflow.log_metric('f1_weighted', metrics_scores['f1_weighted'])
-        mlflow.sklearn.log_model(rf_clf, 'model')
+        mlflow.log_metric("f1_weighted", metrics_scores["f1_weighted"])
+        mlflow.sklearn.log_model(rf_clf, "model")
 
     # y_pred = rf_clf.predict(X_test)
 

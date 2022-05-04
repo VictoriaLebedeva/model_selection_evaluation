@@ -38,8 +38,8 @@ def remove_irrelevant_features(
     return X_train_processed
 
 
-if __name__ == '__main__':
-    df = pd.read_csv('data\\external\\train.csv')
-    target = df['Cover_Type']
-    features = df.drop('Cover_Type', axis=1)
+if __name__ == "__main__":
+    df = pd.read_csv("data\\external\\train.csv")
+    target = df["Cover_Type"]
+    features = df.drop("Cover_Type", axis=1)
     remove_irrelevant_features(features, target)

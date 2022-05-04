@@ -24,7 +24,6 @@ nox = "^2022.1.7"
 
 [tool.black]
 line-length = 79
-skip-string-normalization = true
 
 [tool.poetry.scripts]
 generate-eda = "src.cover_type_classifier.data.generate_eda:generate_eda"

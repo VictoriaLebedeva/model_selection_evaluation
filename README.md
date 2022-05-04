@@ -76,7 +76,9 @@ This project provides the following abilities:
    --report-path <path,where to save predictions> \
    --nrows <number of rows to read from file> \
    --n-neighbors <knn param: number of neighbors> \
-   --weights <knn param: distance weights>
+   --weights <knn param: distance weights> \
+   --min-max-scaler <use feature scaling> \
+   --remove-irrelevant-features <removes irrelevant features> 
     ```
 
     **Random Forest**
@@ -88,7 +90,9 @@ This project provides the following abilities:
    --nrows <number of rows to read from file> \
    --max-features <random forest param: number of features, used in each tree> \
    --n-estimators <random forest param: the number of trees in the forest> \
-   --min-samples-leaf <random forest param: minimum number of samples required to be at a leaf node>
+   --min-samples-leaf <random forest param: minimum number of samples required to be at a leaf node> \
+   --min-max-scaler <use feature scaling> \
+   --remove-irrelevant-features <removes irrelevant features> 
     ```
 
 ### **Experiments** 

@@ -17,8 +17,8 @@ from cover_type_classifier.data import feature_engineering
 
 # model parameter grid
 param = {
-    'n_neighbors': np.arange(1, 20, 1),
-    'weights': ["uniform", "distance"],
+    "n_neighbors": np.arange(1, 20, 1),
+    "weights": ["uniform", "distance"],
 }
 
 
