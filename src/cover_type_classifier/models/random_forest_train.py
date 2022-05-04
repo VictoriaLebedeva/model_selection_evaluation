@@ -2,15 +2,28 @@ import click
 import os
 import pandas as pd
 import numpy as np
+
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_score
 from sklearn.utils import shuffle
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import KFold
+from sklearn.model_selection import GridSearchCV
+
 from cover_type_classifier.data import get_dataset
+from cover_type_classifier.data import feature_engineering
 from datetime import datetime
 
 import mlflow 
 
 mlflow_experiment_id = 2
+
+# model parameter grid
+param = {
+    'max_features': ['auto', 'sqrt', 'log2'],
+    'n_estimators': np.array(10, 50, 10),
+    'min_samples_leaf': np.array(50, 300, 50)
+}
 
 @click.command()
 @click.option(
@@ -60,6 +73,20 @@ mlflow_experiment_id = 2
     show_default=True,
     help="The minimum number of samples required to be at a leaf node.",
 )
+@click.option(
+    "--min-max-scaler",
+    default=False,
+    type=bool,
+    show_default=True,
+    help="Use MinMaxScaler in data preprocessing.",
+)
+@click.option(
+    "--remove-irrelevant-features",
+    default=False,
+    type=bool,
+    show_default=True,
+    help="Dimetion reduction by removing irrelevant features.",
+)
 def train(
     dataset_path: str,
     test_path: str,
@@ -68,14 +95,21 @@ def train(
     max_features: str,  # check this
     n_estimators: int,
     min_samples_leaf: int,
+    min_max_scaler: bool,
+    remove_irrelevant_features: bool,
 ) -> None:
 
     X_train, y_train, X_test = get_dataset.get_dataset(
         dataset_path, test_path, nrows
     )
-    X_train_shuffled, y_train_shuffled = shuffle(
-        X_train, y_train, random_state=42
-    )
+    X_train, y_train = shuffle(X_train, y_train, random_state=42)
+
+    if remove_irrelevant_features:
+        X_train = feature_engineering.remove_irrelevant_features(X_train, y_train)
+    
+    if min_max_scaler:
+        scaler = MinMaxScaler(feature_range=(0,1))
+        X_train = scaler.fit_transform(X_train)
 
     with mlflow.start_run(experiment_id=mlflow_experiment_id):
         rf_clf = RandomForestClassifier(
@@ -87,13 +121,17 @@ def train(
         rf_clf.fit(X_train, y_train)
 
         # cross-validation
+        cv_inner = KFold(n_splits=3, shuffle=True, random_state=1)
+        search = GridSearchCV(rf_clf, param, scoring='f1_weighted', n_jobs=1, cv=cv_inner, refit=True)
+    
         metrics = ["balanced_accuracy", "f1_weighted", "roc_auc_ovo"]
         print("Cross-Validation score results")
 
+        cv_outer = KFold(n_splits=10, shuffle=True, random_state=1)
         metrics_scores = {} 
 
         for metric in metrics:
-            scores = cross_val_score(rf_clf, X_train_shuffled, y_train_shuffled, cv=5, scoring=metric)
+            scores = cross_val_score(search, X_train, y_train, scoring='f1_weighted', cv=cv_outer, n_jobs=-1)
             metrics_scores[metric] = np.mean(scores)
             print(f"{metric}:", scores)
 

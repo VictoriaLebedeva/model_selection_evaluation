@@ -1,15 +1,28 @@
 import click
 import os
+from datetime import datetime
 import pandas as pd
 import numpy as np
 import mlflow
+
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import cross_val_score
 from sklearn.utils import shuffle
-from cover_type_classifier.data import get_dataset
-from datetime import datetime
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import KFold
+from sklearn.model_selection import GridSearchCV
 
+from cover_type_classifier.data import get_dataset
+from cover_type_classifier.data import feature_engineering
+
+# mlflow experiment identifier
 mlflow_experiment_id = 1
+
+# model parameter grid
+param = {
+    'n_neighbors': np.array(1, 20, 1),
+    'weights': ["uniform", "distance"]
+}
 
 @click.command()
 @click.option(
@@ -54,6 +67,20 @@ mlflow_experiment_id = 1
     show_default=True,
     help="kNN model weights.",
 )
+@click.option(
+    "--min-max-scaler",
+    default=False,
+    type=bool,
+    show_default=True,
+    help="Use MinMaxScaler in data preprocessing.",
+)
+@click.option(
+    "--remove-irrelevant-features",
+    default=False,
+    type=bool,
+    show_default=True,
+    help="Dimetion reduction by removing irrelevant features.",
+)
 def train(
     dataset_path: str,
     test_path: str,
@@ -61,29 +88,43 @@ def train(
     nrows: int,
     n_neighbors: int,
     weights: str,
+    min_max_scaler: bool,
+    remove_irrelevant_features: bool,
 ) -> None:
 
     # get data
     X_train, y_train, X_test = get_dataset.get_dataset(
         dataset_path, test_path, nrows
     )
-    X_train_shuffled, y_train_shuffled = shuffle(
-        X_train, y_train, random_state=42
-    )
+    X_train, y_train = shuffle(X_train, y_train, random_state=42)
+
+    if remove_irrelevant_features:
+        X_train = feature_engineering.remove_irrelevant_features(X_train, y_train)
+    
+    if min_max_scaler:
+        scaler = MinMaxScaler(feature_range=(0,1))
+        X_train = scaler.fit_transform(X_train)
+
+
     # train model and make a prediction
     with mlflow.start_run(experiment_id=mlflow_experiment_id):
+        
+        # model initialization
         knn = KNeighborsClassifier(n_neighbors=n_neighbors, weights=weights)
         print("Estimator", knn)
         knn.fit(X_train, y_train)
 
         # cross-validation
+        cv_inner = KFold(n_splits=3, shuffle=True, random_state=1)
+        search = GridSearchCV(knn, param, scoring='f1_weighted', n_jobs=1, cv=cv_inner, refit=True)
         metrics = ["balanced_accuracy", "f1_weighted", "roc_auc_ovo"]
         print("Cross-Validation score results")
 
+        cv_outer = KFold(n_splits=10, shuffle=True, random_state=1)
         metrics_scores = {} 
 
         for metric in metrics:
-            scores = cross_val_score(knn, X_train_shuffled, y_train_shuffled, cv=5, scoring=metric)
+            scores = cross_val_score(search, X_train, y_train, scoring='f1_weighted', cv=cv_outer, n_jobs=-1)
             metrics_scores[metric] = np.mean(scores)
             print(f"{metric}:", scores)
 
