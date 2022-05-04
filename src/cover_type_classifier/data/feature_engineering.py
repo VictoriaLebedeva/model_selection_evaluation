@@ -1,12 +1,14 @@
 import pandas as pd
 import numpy as np
 
-from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import SelectPercentile
 from sklearn.feature_selection import chi2, f_classif
 
 
 def remove_irrelevant_features(X_train: pd.DataFrame, y_train: pd.Series) -> np.ndarray:
+    """ Splits feature set into categorical and numeric and 
+    return new feature set with the most relevant features.
+    """
 
     # split features
     numerical_features = X_train.iloc[:, 1:11]
