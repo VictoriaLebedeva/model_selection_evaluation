@@ -1,12 +1,16 @@
 import click
 import os
 import pandas as pd
+import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_score
 from sklearn.utils import shuffle
 from cover_type_classifier.data import get_dataset
 from datetime import datetime
 
+import mlflow 
+
+mlflow_experiment_id = 2
 
 @click.command()
 @click.option(
@@ -73,29 +77,32 @@ def train(
         X_train, y_train, random_state=42
     )
 
-    # train model and make a prediction
-    rf_clf = RandomForestClassifier(
+    with mlflow.start_run(experiment_id=mlflow_experiment_id):
+        rf_clf = RandomForestClassifier(
         n_estimators=n_estimators,
         max_features=max_features,
         min_samples_leaf=min_samples_leaf,
     )
-    print("Estimator", rf_clf)
-    rf_clf.fit(X_train, y_train)
+        print("Estimator", rf_clf)
+        rf_clf.fit(X_train, y_train)
 
-    # cross-validation
-    metrics = ["balanced_accuracy", "f1_weighted", "roc_auc_ovo"]
-    print("Cross-Validation score results")
-    for metric in metrics:
-        print(
-            f"{metric}:",
-            cross_val_score(
-                rf_clf,
-                X_train_shuffled,
-                y_train_shuffled,
-                cv=5,
-                scoring=metric,
-            ),
-        )
+        # cross-validation
+        metrics = ["balanced_accuracy", "f1_weighted", "roc_auc_ovo"]
+        print("Cross-Validation score results")
+
+        metrics_scores = {} 
+
+        for metric in metrics:
+            scores = cross_val_score(rf_clf, X_train_shuffled, y_train_shuffled, cv=5, scoring=metric)
+            metrics_scores[metric] = np.mean(scores)
+            print(f"{metric}:", scores)
+
+        mlflow.log_param('n_estimators', n_estimators)
+        mlflow.log_param('max_features', max_features)
+        mlflow.log_param('min_samples_leaf', min_samples_leaf)
+        mlflow.log_metric('f1_weighted', metrics_scores['f1_weighted'])
+        mlflow.sklearn.log_model(rf_clf, 'model')
+
 
     y_pred = rf_clf.predict(X_test)
 
