@@ -35,41 +35,54 @@ random_forest_parameters_grid = {
 
 
 def common_options(function):
-    function = click.option("-d", "--dataset-path",
-                            default="data/external/train.csv",
-                            type=click.Path(exists=True, dir_okay=False),
-                            show_default=True,
-                            )(function)
-    function = click.option("-t", "--test-path",
-                            default="data/external/test.csv",
-                            type=click.Path(exists=True, dir_okay=False),
-                            show_default=True,
-                            )(function)
-    function = click.option("-p", "--prediction-path",
-                            default="models/",
-                            type=click.Path(exists=True, dir_okay=True),
-                            show_default=True,
-                            )(function)
-    function = click.option("--nrows", default=None,
-                            type=click.IntRange(1),
-                            show_default=True,
-                            )(function)
-    function = click.option("--min-max-scaler", default=True,
-                            type=bool,
-                            show_default=True,
-                            help="Use MinMaxScaler in data preprocessing.",
-                            )(function)
-    function = click.option("--remove-irrelevant-features",
-                            default=True,
-                            type=bool,
-                            show_default=True,
-                            help="Dimetion reduction by removing irrelevant features.",
-                            )(function)
-    function = click.option("--auto-param-tuning", default=False,
-                            type=bool,
-                            show_default=True,
-                            help="Use automated parameter tuning.",
-                            )(function)
+    function = click.option(
+        "-d",
+        "--dataset-path",
+        default="data/external/train.csv",
+        type=click.Path(exists=True, dir_okay=False),
+        show_default=True,
+    )(function)
+    function = click.option(
+        "-t",
+        "--test-path",
+        default="data/external/test.csv",
+        type=click.Path(exists=True, dir_okay=False),
+        show_default=True,
+    )(function)
+    function = click.option(
+        "-p",
+        "--prediction-path",
+        default="models/",
+        type=click.Path(exists=True, dir_okay=True),
+        show_default=True,
+    )(function)
+    function = click.option(
+        "--nrows",
+        default=None,
+        type=click.IntRange(1),
+        show_default=True,
+    )(function)
+    function = click.option(
+        "--min-max-scaler",
+        default=True,
+        type=bool,
+        show_default=True,
+        help="Use MinMaxScaler in data preprocessing.",
+    )(function)
+    function = click.option(
+        "--remove-irrelevant-features",
+        default=True,
+        type=bool,
+        show_default=True,
+        help="Dimetion reduction by removing irrelevant features.",
+    )(function)
+    function = click.option(
+        "--auto-param-tuning",
+        default=False,
+        type=bool,
+        show_default=True,
+        help="Use automated parameter tuning.",
+    )(function)
     return function
 
 
@@ -99,17 +112,22 @@ def knn_train(
     weights: str,
     min_max_scaler: bool,
     remove_irrelevant_features: bool,
-    auto_param_tuning: bool
+    auto_param_tuning: bool,
 ) -> None:
 
-    model_name = 'knn'
-    model_parameters = {
-        'n_neighbors': n_neighbors,
-        'weights': weights
-    }
-    train(dataset_path, test_path, prediction_path,
-          nrows, min_max_scaler, remove_irrelevant_features,
-          auto_param_tuning, model_name, model_parameters)
+    model_name = "knn"
+    model_parameters = {"n_neighbors": n_neighbors, "weights": weights}
+    train(
+        dataset_path,
+        test_path,
+        prediction_path,
+        nrows,
+        min_max_scaler,
+        remove_irrelevant_features,
+        auto_param_tuning,
+        model_name,
+        model_parameters,
+    )
 
 
 @click.command()
@@ -144,18 +162,26 @@ def random_forest_train(
     min_samples_leaf: int,
     min_max_scaler: bool,
     remove_irrelevant_features: bool,
-    auto_param_tuning: bool
+    auto_param_tuning: bool,
 ) -> None:
 
-    model_name = 'random_forest'
+    model_name = "random_forest"
     model_parameters = {
-        'max_features': max_features,
-        'n_estimators': n_estimators,
-        'min_samples_leaf': min_samples_leaf
+        "max_features": max_features,
+        "n_estimators": n_estimators,
+        "min_samples_leaf": min_samples_leaf,
     }
-    train(dataset_path, test_path, prediction_path,
-          nrows, min_max_scaler, remove_irrelevant_features,
-          auto_param_tuning, model_name, model_parameters)
+    train(
+        dataset_path,
+        test_path,
+        prediction_path,
+        nrows,
+        min_max_scaler,
+        remove_irrelevant_features,
+        auto_param_tuning,
+        model_name,
+        model_parameters,
+    )
 
 
 def train(
@@ -167,30 +193,35 @@ def train(
     remove_irrelevant_features: bool,
     auto_param_tuning: bool,
     model_name: str,
-    model_parameters: dict
+    model_parameters: dict,
 ) -> None:
 
     # get_data
     X_train, y_train, X_test = get_dataset.get_dataset(
         dataset_path, test_path, nrows
     )
+
+    # frame to save predictions
+    df = pd.DataFrame(X_test.index, columns=["Id"])
+
     X_train, y_train = shuffle(X_train, y_train, random_state=42)
 
     if remove_irrelevant_features:
-        X_train = feature_engineering.remove_irrelevant_features(
-            X_train, y_train
+        X_train, X_test = feature_engineering.remove_irrelevant_features(
+            X_train, y_train, X_test
         )
 
     if min_max_scaler:
         scaler = MinMaxScaler(feature_range=(0, 1))
         X_train = scaler.fit_transform(X_train)
+        X_test = scaler.fit_transform(X_test)
 
     # train model and make a prediction
     with mlflow.start_run():
-        if model_name == 'knn':
+        if model_name == "knn":
             model = KNeighborsClassifier(**model_parameters)
             model_parameters_grid = knn_parameters_grid
-        elif model_name == 'random_forest':
+        elif model_name == "random_forest":
             model = RandomForestClassifier(**model_parameters)
             model_parameters_grid = random_forest_parameters_grid
 
@@ -203,12 +234,12 @@ def train(
             model = GridSearchCV(
                 model,
                 model_parameters_grid,
-                scoring='f1_weighted',
+                scoring="f1_weighted",
                 n_jobs=1,
                 cv=cv_inner,
                 refit=True,
             )
-            print('Best estimator', model.best_estimator_)
+            print("Best estimator", model.best_estimator_)
 
         metrics = ["balanced_accuracy", "f1_weighted", "roc_auc_ovo"]
 
@@ -246,11 +277,13 @@ def train(
     y_pred = model.predict(X_test)
     # generate name of the output file
     now = datetime.now()
-    report_filename = f'prediction_{model_name}_{now.strftime("%d%m%Y_%H%M%S")}.csv'
+    report_filename = (
+        f'prediction_{model_name}_{now.strftime("%d%m%Y_%H%M%S")}.csv'
+    )
     output_path = os.path.join(prediction_path, report_filename)
 
     # save prediction to csv
-    df = pd.DataFrame(X_test.index, columns=["Id"])
+
     df["Cover_Type"] = y_pred
     df.to_csv(output_path, index=False)
     print(f"Model output was saved to {output_path}")
