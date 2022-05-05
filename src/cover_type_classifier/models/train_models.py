@@ -225,9 +225,6 @@ def train(
             model = RandomForestClassifier(**model_parameters)
             model_parameters_grid = random_forest_parameters_grid
 
-        print("Estimator", model)
-        model.fit(X_train, y_train)
-
         # cross-validation
         if auto_param_tuning:
             cv_inner = KFold(n_splits=3, shuffle=True, random_state=42)
@@ -239,12 +236,14 @@ def train(
                 cv=cv_inner,
                 refit=True,
             )
-            print("Best estimator", model.best_estimator_)
+
+        model.fit(X_train, y_train)
+        print("Estimator", model.best_estimator_)
 
         metrics = ["balanced_accuracy", "f1_weighted", "roc_auc_ovo"]
 
         print("Cross-Validation score results")
-        cv_outer = KFold(n_splits=10, shuffle=True, random_state=42)
+        cv_outer = KFold(n_splits=5, shuffle=True, random_state=42)
         metrics_scores = {}
 
         for metric in metrics:
