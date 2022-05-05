@@ -26,11 +26,8 @@ line-length = 79
 
 [tool.poetry.scripts]
 generate-eda = "src.cover_type_classifier.data.generate_eda:generate_eda"
-knn-train = "src.cover_type_classifier.models.knn_train:train"
-rf-train = "src.cover_type_classifier.models.random_forest_train:train"
-
-knn-train-test = "src.cover_type_classifier.models.train_models:knn_train"
-rf-train-test = "src.cover_type_classifier.models.train_models:random_forest_train"
+knn-train = "src.cover_type_classifier.models.train_models:knn_train"
+rf-train = "src.cover_type_classifier.models.train_models:random_forest_train"
 
 
 [build-system]
