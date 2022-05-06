@@ -3,6 +3,8 @@ import numpy as np
 
 from typing import Tuple
 
+from sklearn.utils import shuffle
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.feature_selection import SelectPercentile
 from sklearn.feature_selection import chi2, f_classif
 
@@ -52,6 +54,24 @@ def remove_irrelevant_features(
     print("Reduced number of features (test):", X_test_processed.shape[1])
 
     return X_train_processed, X_test_processed
+
+
+def process_data(X_train: pd.DataFrame,
+                 y_train: pd.Series,
+                 remove_irrelevant_features: bool,
+                 min_max_scaler: bool
+                 ) -> Tuple[pd.DataFrame, pd.Series]:
+    X_train, y_train = shuffle(X_train, y_train, random_state=42)
+
+    if remove_irrelevant_features:
+        X_train, X_test = remove_irrelevant_features(
+            X_train, y_train, X_test
+        )
+
+    if min_max_scaler:
+        scaler = MinMaxScaler(feature_range=(0, 1))
+        X_train = scaler.fit_transform(X_train)
+        X_test = scaler.fit_transform(X_test)
 
 
 if __name__ == "__main__":
