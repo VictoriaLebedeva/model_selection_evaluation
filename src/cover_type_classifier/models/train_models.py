@@ -1,6 +1,8 @@
 import click
 import os
 from datetime import datetime
+from typing import Tuple
+
 import pandas as pd
 import numpy as np
 import mlflow
@@ -32,8 +34,6 @@ random_forest_parameters_grid = {
 
 
 # common model options
-
-
 def common_options(function):
     function = click.option(
         "-d",
@@ -183,6 +183,21 @@ def random_forest_train(
         model_parameters,
     )
 
+def write_prediction_to_file(index: pd.Series, y_pred: pd.Series, model_name: str, prediction_path: str) -> None:
+    
+    df = pd.DataFrame(index, columns=["Id"])
+    
+    # generate name of the output file
+    now = datetime.now()
+    report_filename = (
+        f'prediction_{model_name}_{now.strftime("%d%m%Y_%H%M%S")}.csv'
+    )
+    output_path = os.path.join(prediction_path, report_filename)
+
+    # save prediction to csv
+    df["Cover_Type"] = y_pred
+    df.to_csv(output_path, index=False)
+    print(f"Model output was saved to {output_path}")
 
 def train(
     dataset_path: str,
@@ -201,20 +216,12 @@ def train(
         dataset_path, test_path, nrows
     )
 
-    # frame to save predictions
-    df = pd.DataFrame(X_test.index, columns=["Id"])
+    #save Test index
+    index = X_test.index
 
-    X_train, y_train = shuffle(X_train, y_train, random_state=42)
-
-    if remove_irrelevant_features:
-        X_train, X_test = feature_engineering.remove_irrelevant_features(
-            X_train, y_train, X_test
-        )
-
-    if min_max_scaler:
-        scaler = MinMaxScaler(feature_range=(0, 1))
-        X_train = scaler.fit_transform(X_train)
-        X_test = scaler.fit_transform(X_test)
+    # process data
+    X_train, y_train = feature_engineering.process_data(
+        X_train, y_train, remove_irrelevant_features, min_max_scaler)
 
     # train model and make a prediction
     with mlflow.start_run():
@@ -274,15 +281,4 @@ def train(
                 mlflow.log_param(param_name, param_value)
 
     y_pred = model.predict(X_test)
-    # generate name of the output file
-    now = datetime.now()
-    report_filename = (
-        f'prediction_{model_name}_{now.strftime("%d%m%Y_%H%M%S")}.csv'
-    )
-    output_path = os.path.join(prediction_path, report_filename)
-
-    # save prediction to csv
-
-    df["Cover_Type"] = y_pred
-    df.to_csv(output_path, index=False)
-    print(f"Model output was saved to {output_path}")
+    write_prediction_to_file(index, y_pred, model_name, prediction_path)
