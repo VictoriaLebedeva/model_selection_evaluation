@@ -1,7 +1,6 @@
 import click
 import os
 from datetime import datetime
-from typing import Tuple
 
 import pandas as pd
 import numpy as np
@@ -10,8 +9,6 @@ import mlflow
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import cross_val_score
-from sklearn.utils import shuffle
-from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import KFold
 from sklearn.model_selection import GridSearchCV
 
@@ -117,17 +114,31 @@ def knn_train(
 
     model_name = "knn"
     model_parameters = {"n_neighbors": n_neighbors, "weights": weights}
-    train(
-        dataset_path,
-        test_path,
-        prediction_path,
-        nrows,
-        min_max_scaler,
-        remove_irrelevant_features,
+    feature_engineering_parameters = {
+        "min_max_scaler": min_max_scaler,
+        "remove_irrelevant_features": remove_irrelevant_features,
+    }
+
+    # get data
+    X_train, y_train, X_test = get_dataset.get_dataset(
+        dataset_path, test_path, nrows
+    )
+    index = X_test.index
+
+    # process data
+    X_train, y_train, X_test = feature_engineering.process_data(
+        X_train, y_train, X_test, remove_irrelevant_features, min_max_scaler
+    )
+    y_pred = train(
+        X_train,
+        y_train,
+        X_test,
+        feature_engineering_parameters,
         auto_param_tuning,
         model_name,
         model_parameters,
     )
+    write_prediction_to_file(index, y_pred, model_name, prediction_path)
 
 
 @click.command()
@@ -171,22 +182,38 @@ def random_forest_train(
         "n_estimators": n_estimators,
         "min_samples_leaf": min_samples_leaf,
     }
-    train(
-        dataset_path,
-        test_path,
-        prediction_path,
-        nrows,
-        min_max_scaler,
-        remove_irrelevant_features,
+
+    feature_engineering_parameters = {
+        "min_max_scaler": min_max_scaler,
+        "remove_irrelevant_features": remove_irrelevant_features,
+    }
+    # get data
+    X_train, y_train, X_test = get_dataset.get_dataset(
+        dataset_path, test_path, nrows
+    )
+    index = X_test.index
+
+    # process data
+    X_train, y_train, X_test = feature_engineering.process_data(
+        X_train, y_train, X_test, remove_irrelevant_features, min_max_scaler
+    )
+    y_pred = train(
+        X_train,
+        y_train,
+        X_test,
+        feature_engineering_parameters,
         auto_param_tuning,
         model_name,
         model_parameters,
     )
+    write_prediction_to_file(index, y_pred, model_name, prediction_path)
 
-def write_prediction_to_file(index: pd.Series, y_pred: pd.Series, model_name: str, prediction_path: str) -> None:
-    
+
+def write_prediction_to_file(
+    index: pd.Series, y_pred: pd.Series, model_name: str, prediction_path: str
+) -> None:
     df = pd.DataFrame(index, columns=["Id"])
-    
+
     # generate name of the output file
     now = datetime.now()
     report_filename = (
@@ -199,29 +226,16 @@ def write_prediction_to_file(index: pd.Series, y_pred: pd.Series, model_name: st
     df.to_csv(output_path, index=False)
     print(f"Model output was saved to {output_path}")
 
+
 def train(
-    dataset_path: str,
-    test_path: str,
-    prediction_path: str,
-    nrows: int,
-    min_max_scaler: bool,
-    remove_irrelevant_features: bool,
+    X_train: pd.DataFrame,
+    y_train: pd.Series,
+    X_test: pd.DataFrame,
+    feature_engineering_parameters: dict,
     auto_param_tuning: bool,
     model_name: str,
     model_parameters: dict,
-) -> None:
-
-    # get_data
-    X_train, y_train, X_test = get_dataset.get_dataset(
-        dataset_path, test_path, nrows
-    )
-
-    #save Test index
-    index = X_test.index
-
-    # process data
-    X_train, y_train = feature_engineering.process_data(
-        X_train, y_train, remove_irrelevant_features, min_max_scaler)
+) -> pd.Series:
 
     # train model and make a prediction
     with mlflow.start_run():
@@ -232,7 +246,7 @@ def train(
             model = RandomForestClassifier(**model_parameters)
             model_parameters_grid = random_forest_parameters_grid
 
-        # cross-validation
+        # nested cross-validation
         if auto_param_tuning:
             cv_inner = KFold(n_splits=3, shuffle=True, random_state=42)
             model = GridSearchCV(
@@ -248,7 +262,6 @@ def train(
         print("Estimator", model.best_estimator_)
 
         metrics = ["balanced_accuracy", "f1_weighted", "roc_auc_ovo"]
-
         print("Cross-Validation score results")
         cv_outer = KFold(n_splits=5, shuffle=True, random_state=42)
         metrics_scores = {}
@@ -265,10 +278,9 @@ def train(
             metrics_scores[metric] = np.mean(scores)
             print(f"{metric}:", scores)
 
-        mlflow.log_param(
-            "remove_irrelevant_features", remove_irrelevant_features
-        )
-        mlflow.log_param("min_max_scaler", min_max_scaler)
+        for param_name, param_value in feature_engineering_parameters.items():
+            mlflow.log_param(param_name, param_value)
+
         mlflow.sklearn.log_model(model, "model")
         mlflow.log_metric("f1_weighted", metrics_scores["f1_weighted"])
 
@@ -281,4 +293,4 @@ def train(
                 mlflow.log_param(param_name, param_value)
 
     y_pred = model.predict(X_test)
-    write_prediction_to_file(index, y_pred, model_name, prediction_path)
+    return y_pred

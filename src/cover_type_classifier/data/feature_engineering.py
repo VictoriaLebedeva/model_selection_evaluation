@@ -56,22 +56,23 @@ def remove_irrelevant_features(
     return X_train_processed, X_test_processed
 
 
-def process_data(X_train: pd.DataFrame,
-                 y_train: pd.Series,
-                 remove_irrelevant_features: bool,
-                 min_max_scaler: bool
-                 ) -> Tuple[pd.DataFrame, pd.Series]:
+def process_data(
+    X_train: pd.DataFrame,
+    y_train: pd.Series,
+    X_test: pd.DataFrame,
+    remove_irrelevant_features: bool,
+    min_max_scaler: bool,
+) -> Tuple[np.ndarray, np.ndarray]:
     X_train, y_train = shuffle(X_train, y_train, random_state=42)
 
     if remove_irrelevant_features:
-        X_train, X_test = remove_irrelevant_features(
-            X_train, y_train, X_test
-        )
+        X_train, X_test = remove_irrelevant_features(X_train, y_train, X_test)
 
     if min_max_scaler:
         scaler = MinMaxScaler(feature_range=(0, 1))
         X_train = scaler.fit_transform(X_train)
         X_test = scaler.fit_transform(X_test)
+    return X_train, X_test
 
 
 if __name__ == "__main__":
