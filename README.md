@@ -24,8 +24,10 @@ This project uses [Forest Cover Type Prediction](https://www.kaggle.com/competit
 │       |   |- generate_eda.py
 │       |   |- get_dataset.py
 │       │- init.py                     <---- Makes src a Python module
-│- tests                               <---- Project tests
-|   │- ... (to be done)
+│- tests                               <---- Model and data functions tests
+|   │- conftest.py
+|   │- test_data.py
+|   │- test_models.py
 |- .gitignore
 |- LICENSE
 |- poetry.lock                         <---- Project dependencies
@@ -73,7 +75,7 @@ This project provides the following abilities:
    poetry run knn-train \
    --dataset-path <path to train data> \
    --test-path <path to test data> \
-   --report-path <path,where to save predictions> \
+   --report-path <path, where to save predictions> \
    --nrows <number of rows to read from file> \
    --n-neighbors <knn param: number of neighbors> \
    --weights <knn param: distance weights> \
@@ -126,3 +128,27 @@ Then follow the link listed under **Listening at** (for example, http://<i></i>1
     ```
   If there are no errors, you will get the following report:
   ![linting_code](assets/mypy_report.png)
+
+* Testing the code 
+
+  To run test type the following command in terminal:
+   ```sh
+   poetry run pytest
+    ```
+  If all tests are passed, you will get the following report:
+  После написания всех тестов вставить картинку
+  ![linting_code](assets/mypy_report.png)
+
+* Running multiple sessions 
+
+  All above step can be combined into one command, using **nox**:
+   ```sh
+   poetry run nox
+    ```
+  If all sessions were complited succesfully, you will get the following report:
+![nox_sessions](assets/nox_sessions.png) 
+
+Also this repository supports Github action, which allows linting and testing code when you commit changes.
+If there is no errors you **Action** tab will look like the following
+![github_action](assets/github_action.png) 
+
