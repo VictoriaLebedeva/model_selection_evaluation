@@ -1,6 +1,6 @@
-# #  test to save prediction
-# def test_create_file(tmpdir):
-#     p = tmpdir.mkdir("sub").join("hello.txt")
-#     p.write("content")
-#     assert p.read() == "content"
-#     assert len(tmpdir.listdir()) == 1
+def test_train_knn():
+    pass
+
+
+def test_train_random_forest():
+    pass
