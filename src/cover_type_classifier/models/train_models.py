@@ -61,23 +61,17 @@ def common_options(function):
     )(function)
     function = click.option(
         "--min-max-scaler",
-        default=True,
-        type=bool,
-        show_default=True,
+        is_flag=True,
         help="Use MinMaxScaler in data preprocessing.",
     )(function)
     function = click.option(
         "--remove-irrelevant-features",
-        default=True,
-        type=bool,
-        show_default=True,
+        is_flag=True,
         help="Dimetion reduction by removing irrelevant features.",
     )(function)
     function = click.option(
         "--auto-param-tuning",
-        default=False,
-        type=bool,
-        show_default=True,
+        is_flag=True,
         help="Use automated parameter tuning.",
     )(function)
     return function
@@ -126,9 +120,9 @@ def knn_train(
     index = X_test.index
 
     # process data
-    X_train, y_train, X_test = feature_engineering.process_data(
-        X_train, y_train, X_test, remove_irrelevant_features, min_max_scaler
-    )
+    # X_train, X_test = feature_engineering.process_data(
+    #     X_train, y_train, X_test, remove_irrelevant_features, min_max_scaler
+    # )
     y_pred = train(
         X_train,
         y_train,
@@ -259,7 +253,7 @@ def train(
             )
 
         model.fit(X_train, y_train)
-        print("Estimator", model.best_estimator_)
+        print("Estimator", model)
 
         metrics = ["balanced_accuracy", "f1_weighted", "roc_auc_ovo"]
         print("Cross-Validation score results")
