@@ -12,9 +12,9 @@ This project uses [Forest Cover Type Prediction](https://www.kaggle.com/competit
 
 ## Project structure
 ```
+|- .github/workflows                   <---- GitHub action configuration
 |- assets                              <---- Screenshots of the code check
-|- models                              <---- Models predictions
-|- notebooks                           <---- EDA and data and model researches                   
+|- models                              <---- Models predictions                 
 │- src  
 │   └─ cover_type_classifier           <---- Source code for the project
 │       │- models                      <---- Scripts for training, tuning models, making predictions
@@ -30,9 +30,12 @@ This project uses [Forest Cover Type Prediction](https://www.kaggle.com/competit
 |   │- test_models.py
 |- .gitignore
 |- LICENSE
+|- README.md                           <---- Project description
+|- mypy.ini                            <---- mypy configuration
+|- noxfile.py                          <---- nox configuration
 |- poetry.lock                         <---- Project dependencies
 |- pyproject.toml                      <---- Project dependencies
-|- README.md                           <---- Project description
+
 ```
 
 ## Configuring local enviroment
