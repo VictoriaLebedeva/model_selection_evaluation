@@ -163,7 +163,7 @@ def random_forest_train(
     test_path: str,
     prediction_path: str,
     nrows: int,
-    max_features: str, 
+    max_features: str,
     n_estimators: int,
     min_samples_leaf: int,
     min_max_scaler: bool,
