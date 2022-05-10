@@ -148,8 +148,7 @@ Then follow the link listed under **Listening at** (for example, http://<i></i>1
    poetry run pytest
     ```
   If all tests are passed, you will get the following report:
-  После написания всех тестов вставить картинку
-  ![linting_code](assets/mypy_report.png)
+  ![pytest_report](assets/pytest_report.png)
 
 * Running multiple sessions 
 
