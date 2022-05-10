@@ -206,7 +206,7 @@ def random_forest_train(
 
 def write_prediction_to_file(
     index: pd.Series, y_pred: pd.Series, model_name: str, prediction_path: str
-) -> None:
+) -> str:
     df = pd.DataFrame(index, columns=["Id"])
 
     # generate name of the output file
@@ -220,6 +220,7 @@ def write_prediction_to_file(
     df["Cover_Type"] = y_pred
     df.to_csv(output_path, index=False)
     print(f"Model output was saved to {output_path}")
+    return output_path
 
 
 def train(
