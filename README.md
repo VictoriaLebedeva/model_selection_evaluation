@@ -79,6 +79,8 @@ This project provides the following abilities:
     --dataset-path <path to csv file> \
     --report-path <directory, to save report>
     ```
+  Example of the command output
+  ![report](assets/pandas-profiling.png)
  * **Train classifiers**  
    **NOTE (for reviewers)** Making predictions for data in test.csv takes much time, so in order to make homework check faster I added parameter **nrows**. It will allow to read only part of the data. By default all row of the dataset will be read.
 
@@ -108,6 +110,8 @@ This project provides the following abilities:
    --min-max-scaler <use feature scaling> \
    --remove-irrelevant-features <removes irrelevant features> 
     ```
+    Example of command output
+    ![rf](assets/rf-train.png)
 
 ### **Experiments** 
 Manual parameter tuning experiments can be seen in MLFlow UI. Run MLFrow using the following command:
