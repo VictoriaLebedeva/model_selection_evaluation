@@ -120,9 +120,9 @@ def knn_train(
     index = X_test.index
 
     # process data
-    # X_train, X_test = feature_engineering.process_data(
-    #     X_train, y_train, X_test, remove_irrelevant_features, min_max_scaler
-    # )
+    X_train, X_test = feature_engineering.process_data(
+        X_train, y_train, X_test, remove_irrelevant_features, min_max_scaler
+    )
     y_pred = train(
         X_train,
         y_train,
@@ -140,6 +140,7 @@ def knn_train(
 @click.option(
     "--max-features",
     default="auto",
+    type=click.Choice(["auto", "sqrt", "log2"]),
     show_default=True,
     help="Maximum features used for each tree.",
 )
@@ -162,7 +163,7 @@ def random_forest_train(
     test_path: str,
     prediction_path: str,
     nrows: int,
-    max_features: str,  # check this
+    max_features: str, 
     n_estimators: int,
     min_samples_leaf: int,
     min_max_scaler: bool,
