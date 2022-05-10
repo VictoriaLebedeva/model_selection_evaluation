@@ -49,7 +49,7 @@ def test_error_for_invalid_profiler(runner: CliRunner) -> None:
 
 def test_feature_enginnering(write_to_file: Fixture[str, str]) -> None:
     """
-    Method should processed dataframe.
+    Method should return processed dataframe.
     """
     data_path, test_path = write_to_file
     X_train, y_train, X_test = get_dataset.get_dataset(data_path, test_path)
