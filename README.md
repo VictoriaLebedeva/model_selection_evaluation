@@ -56,7 +56,7 @@ poetry --version
 If everything is installed, move to the usage instruction.
 
 1. Clone repository.
-2. Download  dataset from the website [Forest Cover Type Prediction](https://www.kaggle.com/competitions/forest-cover-type-prediction/data), save csv locally (default path is data/external/train.csv in repository's root).
+2. Download  dataset from the website [Forest Cover Type Prediction](https://www.kaggle.com/competitions/forest-cover-type-prediction/data), save csv locally (default path is data/external/train.csv and data/external/test.csv in repository's root).
 3. Install necessary dependencies by running the following commands in terminal. 
 
 **Possible options:**
