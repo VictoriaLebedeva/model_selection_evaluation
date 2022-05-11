@@ -11,6 +11,7 @@ This project uses [Forest Cover Type Prediction](https://www.kaggle.com/competit
 
 
 ## Project structure
+This package was developed, using WSL: Ubuntu-20.04
 ```
 |- .github/workflows                   <---- GitHub action configuration
 |- assets                              <---- Screenshots of the code check
