@@ -54,13 +54,17 @@ def test_feature_enginnering(write_to_file: Fixture[str, str]) -> None:
     data_path, test_path = write_to_file
     X_train, y_train, X_test = get_dataset.get_dataset(data_path, test_path)
 
-    X_train_proc, y_train_proc, X_test_proc = feature_engineering.process_data(
-        X_train, y_train, X_test, True, True
+    pipeline = feature_engineering.transformation_pipeline(
+        remove_irrelevant_features_flag=True, min_max_scaler=True
     )
+
+    pipeline.fit(X_train, y_train)
+    X_train_proc = pipeline.transform(X_train)
+    X_test_proc = pipeline.transform(X_test)
+
     assert (
         X_train_proc.shape[1] <= X_train.shape[1]
         and X_test_proc.shape[1] <= X_test.shape[1]
     )
-    print(0 <= X_train_proc)
-    assert ((0 <= X_train_proc) & (X_train_proc < 2)).all()
-    assert ((0 <= X_test_proc) & (X_test_proc < 2)).all()
+    assert ((-1 <= X_train_proc) & (X_train_proc < 2)).all()
+    assert ((-1 <= X_test_proc) & (X_test_proc < 2)).all()

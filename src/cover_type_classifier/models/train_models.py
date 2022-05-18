@@ -329,4 +329,4 @@ def save_model(estimator: object, pipeline: Pipeline, model_name: str) -> None:
     path = os.path.join("models/models", model_filename)
     with open(path, "wb") as f_out:
         pickle.dump((estimator, pipeline), f_out)
-        print(f'Model was succesfully saved in {path}!')
+        print(f"Model was succesfully saved in {path}!")

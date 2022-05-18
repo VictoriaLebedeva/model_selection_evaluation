@@ -23,7 +23,9 @@ def test_train_knn(write_to_file: Fixture[str, str]) -> None:
     """
     data_path, test_path = write_to_file
     X_train, y_train, X_test = get_dataset.get_dataset(data_path, test_path)
-    y_pred = train_models.train(X_train, y_train, X_test, {}, False, "knn", {})
+    y_pred, _ = train_models.train(
+        X_train, y_train, X_test, {}, False, "knn", {}
+    )
 
     assert y_pred.shape[0] == X_test.shape[0]
     assert set(y_pred) == set(y_train)
@@ -35,7 +37,7 @@ def test_train_random_forest(write_to_file: Fixture[str, str]) -> None:
     """
     data_path, test_path = write_to_file
     X_train, y_train, X_test = get_dataset.get_dataset(data_path, test_path)
-    y_pred = train_models.train(
+    y_pred, _ = train_models.train(
         X_train, y_train, X_test, {}, False, "random_forest", {}
     )
 
@@ -47,7 +49,7 @@ def test_save_prediction_to_file(get_prediction_knn, tmpdir_factory) -> None:
     """
     Check, whether file was written correctly.
     """
-    y_pred = get_prediction_knn
+    y_pred, _ = get_prediction_knn
     path = str(tmpdir_factory.mktemp("predictions"))
     index = pd.Index([x for x in range(len(y_pred))])
 
