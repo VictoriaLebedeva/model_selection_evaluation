@@ -14,7 +14,9 @@ def transformation_pipeline(
 ) -> Pipeline:
     pipeline_steps = []
     if min_max_scaler:
-        pipeline_steps.append(("min_max_scaler", MinMaxScaler(feature_range=(0, 1))))
+        pipeline_steps.append(
+            ("min_max_scaler", MinMaxScaler(feature_range=(0, 1)))
+        )
     if remove_irrelevant_features_flag:
         pipeline_steps.append(
             ("remove_irrelevant_features", RemoveIrrelevantFeatures())
