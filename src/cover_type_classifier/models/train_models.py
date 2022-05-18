@@ -1,22 +1,24 @@
 import click
 import os
+import pickle
 from datetime import datetime
 
 import pandas as pd
 import numpy as np
 import mlflow
 
+from sklearn.utils import shuffle
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import KFold
 from sklearn.model_selection import GridSearchCV
+from sklearn.pipeline import Pipeline
 
 from cover_type_classifier.data import get_dataset
 from cover_type_classifier.data import feature_engineering
 
 # kNN parameter grid
-
 knn_parameters_grid = {
     "n_neighbors": np.arange(1, 20, 1),
     "weights": ["uniform", "distance"],
@@ -49,7 +51,7 @@ def common_options(function):
     function = click.option(
         "-p",
         "--prediction-path",
-        default="models/",
+        default="models/predictions/",
         type=click.Path(exists=True, dir_okay=True),
         show_default=True,
     )(function)
@@ -118,12 +120,17 @@ def knn_train(
         dataset_path, test_path, nrows
     )
     index = X_test.index
+    X_train, y_train = shuffle(X_train, y_train, random_state=0)
 
     # process data
-    X_train, X_test = feature_engineering.process_data(
-        X_train, y_train, X_test, remove_irrelevant_features, min_max_scaler
+    pipeline = feature_engineering.transformation_pipeline(
+        remove_irrelevant_features, min_max_scaler
     )
-    y_pred = train(
+    pipeline.fit(X_train, y_train)
+    X_train = pipeline.transform(X_train)
+    X_test = pipeline.transform(X_test)
+
+    y_pred, estimator = train(
         X_train,
         y_train,
         X_test,
@@ -132,7 +139,16 @@ def knn_train(
         model_name,
         model_parameters,
     )
-    write_prediction_to_file(index, y_pred, model_name, prediction_path)
+
+    print("Do you want to save model prediction? (y/n)")
+    is_save_model_prediction = input()
+    print("Do you want to save model? (y/n)")
+    is_save_model = input()
+
+    if is_save_model_prediction.lower().strip() == "y":
+        write_prediction_to_file(index, y_pred, model_name, prediction_path)
+    if is_save_model.lower().strip() == "y":
+        save_model(estimator, pipeline, model_name)
 
 
 @click.command()
@@ -187,12 +203,17 @@ def random_forest_train(
         dataset_path, test_path, nrows
     )
     index = X_test.index
+    X_train, y_train = shuffle(X_train, y_train, random_state=0)
 
     # process data
-    X_train, y_train, X_test = feature_engineering.process_data(
-        X_train, y_train, X_test, remove_irrelevant_features, min_max_scaler
+    pipeline = feature_engineering.transformation_pipeline(
+        remove_irrelevant_features, min_max_scaler
     )
-    y_pred = train(
+    pipeline.fit(X_train, y_train)
+    X_train = pipeline.transform(X_train)
+    X_test = pipeline.transform(X_test)
+
+    y_pred, estimator = train(
         X_train,
         y_train,
         X_test,
@@ -201,7 +222,16 @@ def random_forest_train(
         model_name,
         model_parameters,
     )
-    write_prediction_to_file(index, y_pred, model_name, prediction_path)
+
+    print("Do you want to save model prediction? (y/n)")
+    is_save_model_prediction = input()
+    print("Do you want to save model? (y/n)")
+    is_save_model = input()
+
+    if is_save_model_prediction.lower().strip() == "y":
+        write_prediction_to_file(index, y_pred, model_name, prediction_path)
+    if is_save_model.lower().strip() == "y":
+        save_model(estimator, pipeline, model_name)
 
 
 def write_prediction_to_file(
@@ -289,4 +319,14 @@ def train(
                 mlflow.log_param(param_name, param_value)
 
     y_pred = model.predict(X_test)
-    return y_pred
+    return y_pred, model
+
+
+def save_model(estimator: object, pipeline: Pipeline, model_name: str) -> None:
+    """Saves fitted model into .bin file"""
+    now = datetime.now()
+    model_filename = f'{model_name}_{now.strftime("%d%m%Y_%H%M%S")}.bin'
+    path = os.path.join("models/models", model_filename)
+    with open(path, "wb") as f_out:
+        pickle.dump((estimator, pipeline), f_out)
+        print(f'Model was succesfully saved in {path}!')
