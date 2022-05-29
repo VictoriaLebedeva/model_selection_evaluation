@@ -1,0 +1,5 @@
+api_model_path: 'models/models/random_forest_18052022_211019.bin'
+dataset_path: "data/external/train.csv"
+test_path: "data/external/test.csv"
+report_path: "data/eda_reports"
+prediction_path: "models/predictions/"

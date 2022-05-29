@@ -8,6 +8,7 @@ def load_model(model_path: str) -> object:
         model, pipeline = pickle.load(file)
     return model, pipeline
 
+
 @click.command()
 @click.option(
     "--model-path",

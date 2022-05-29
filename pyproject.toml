@@ -13,6 +13,7 @@ click = "^8.1.2"
 sweetviz = "^2.1.3"
 pandas-profiling = "^3.1.0"
 mlflow = "^1.25.1"
+Flask = "^2.1.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
@@ -28,6 +29,7 @@ line-length = 79
 generate-eda = "src.cover_type_classifier.data.generate_eda:generate_eda"
 knn-train = "src.cover_type_classifier.models.train_models:knn_train"
 rf-train = "src.cover_type_classifier.models.train_models:random_forest_train"
+app = "src.cover_type_classifier.api.app:main"
 
 
 [build-system]
