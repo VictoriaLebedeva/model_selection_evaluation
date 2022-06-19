@@ -1,8 +1,8 @@
 import pytest
 
-from cover_type_classifier.data import get_dataset
-from cover_type_classifier.data import generate_eda
-from cover_type_classifier.data import feature_engineering
+from src.cover_type_classifier.data import get_dataset
+from src.cover_type_classifier.data import generate_eda
+from src.cover_type_classifier.data import feature_engineering
 from click.testing import CliRunner
 
 from typing import Union

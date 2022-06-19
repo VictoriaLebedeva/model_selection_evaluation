@@ -3,8 +3,8 @@ import numpy as np
 import pytest
 
 from typing import Union
-from cover_type_classifier.data import get_dataset
-from cover_type_classifier.models import train_models
+from src.cover_type_classifier.data import get_dataset
+from src.cover_type_classifier.models import train_models
 
 Fixture = Union
 
