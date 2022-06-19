@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.pipeline import Pipeline
 
-from cover_type_classifier.data.custom_estimator import (
+from src.cover_type_classifier.data.custom_estimator import (
     RemoveIrrelevantFeatures,
     NoTransformation,
 )

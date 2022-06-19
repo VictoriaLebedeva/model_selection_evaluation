@@ -1,5 +1,6 @@
-import click
 import pickle
+import pandas as pd
+import numpy as np
 
 
 def load_model(model_path: str) -> object:
@@ -9,14 +10,10 @@ def load_model(model_path: str) -> object:
     return model, pipeline
 
 
-@click.command()
-@click.option(
-    "--model-path",
-    "-np",
-    type=click.Path(exists=True, dir_okay=False),
-)
-def predict(model_path, data):
+def predict(model_path: str, data: dict) -> np.ndarray:
+    df = pd.DataFrame([data])
+    df.columns = df.columns.str.lower()
     model, pipeline = load_model(model_path)
-    data = pipeline.transform(data)
-    prediction = model.predict(data)
+    df = pipeline.transform(df)
+    prediction = model.predict(df)
     return prediction

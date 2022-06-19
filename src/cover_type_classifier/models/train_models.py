@@ -15,8 +15,8 @@ from sklearn.model_selection import KFold
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
 
-from cover_type_classifier.data import get_dataset
-from cover_type_classifier.data import feature_engineering
+from src.cover_type_classifier.data import get_dataset
+from src.cover_type_classifier.data import feature_engineering
 
 # kNN parameter grid
 knn_parameters_grid = {
@@ -24,9 +24,10 @@ knn_parameters_grid = {
     "weights": ["uniform", "distance"],
 }
 
+
 # model parameter grid
 random_forest_parameters_grid = {
-    "max_features": ["auto", "sqrt", "log2"],
+    "max_features": ["sqrt", "log2"],
     "n_estimators": np.arange(10, 50, 10),
     "min_samples_leaf": np.arange(50, 300, 50),
 }
@@ -155,8 +156,8 @@ def knn_train(
 @common_options
 @click.option(
     "--max-features",
-    default="auto",
-    type=click.Choice(["auto", "sqrt", "log2"]),
+    default="sqrt",
+    type=click.Choice(["sqrt", "log2"]),
     show_default=True,
     help="Maximum features used for each tree.",
 )
