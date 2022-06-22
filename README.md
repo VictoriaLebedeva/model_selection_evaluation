@@ -166,9 +166,9 @@ Then follow the link listed under **Listening at** (for example, http://<i></i>1
 
 * Web-service 
   
-  Also you can use your models as a web service:
+  Also you can use your models as a web service, so you can send HTTP request in otder to get the prediction:
    ```sh
-   poetry run nox
+   poetry run app <path to the model>
     ```
 
 
