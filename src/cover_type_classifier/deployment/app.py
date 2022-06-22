@@ -1,10 +1,9 @@
+import click
 from src.cover_type_classifier.models.predict import predict
 from flask import Flask, request, jsonify
 
 # initialize app
 app = Flask(__name__)
-
-object_path = "models\\models\\random_forest_15062022_152514.bin"
 
 cover_types = {
     1: "Spruce/Fir",
@@ -22,7 +21,7 @@ def predict_value():
     result = []
     data = request.get_json()
     for row in data:
-        prediction = predict(object_path, row)
+        prediction = predict(app.config["model_path"], row)
         output = {
             "code": prediction.tolist(),
             "cover_type": cover_types[prediction[0]],
@@ -31,7 +30,15 @@ def predict_value():
     return jsonify(result)
 
 
-def main():
+@click.command()
+@click.option(
+    "--model-path",
+    default="models\\models\\random_forest_18052022_211019.bin",
+    type=click.Path(exists=True, dir_okay=False),
+    help="Patn to the model.",
+)
+def main(model_path: str) -> None:
+    app.config["model_path"] = model_path
     app.run(debug=False, host="0.0.0.0", port=9696)
 
 

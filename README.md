@@ -164,7 +164,17 @@ Then follow the link listed under **Listening at** (for example, http://<i></i>1
   If all sessions were complited succesfully, you will get the following report:
 ![nox_sessions](assets/nox_sessions.png) 
 
+* Web-service 
+  
+  Also you can use your models as a web service:
+   ```sh
+   poetry run nox
+    ```
+
+
 Also this repository supports Github action, which allows linting and testing code when you commit changes.
 If there is no errors you **Action** tab will look like the following
 ![github_action](assets/github_action.png) 
+
+
 
