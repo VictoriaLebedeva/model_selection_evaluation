@@ -1,6 +1,6 @@
 import click
 import os
-import pickle
+import joblib
 from datetime import datetime
 
 import pandas as pd
@@ -329,5 +329,5 @@ def save_model(estimator: object, pipeline: Pipeline, model_name: str) -> None:
     model_filename = f'{model_name}_{now.strftime("%d%m%Y_%H%M%S")}.bin'
     path = os.path.join("models/models", model_filename)
     with open(path, "wb") as f_out:
-        pickle.dump((estimator, pipeline), f_out)
+        joblib.dump((estimator, pipeline), f_out)
         print(f"Model was succesfully saved in {path}!")

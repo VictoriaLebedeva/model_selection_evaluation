@@ -33,7 +33,7 @@ def predict_value():
 @click.command()
 @click.option(
     "--model-path",
-    default="models\\models\\random_forest_18052022_211019.bin",
+    default="models/models/random_forest_23062022_065853.bin",
     type=click.Path(exists=True, dir_okay=False),
     help="Patn to the model.",
 )

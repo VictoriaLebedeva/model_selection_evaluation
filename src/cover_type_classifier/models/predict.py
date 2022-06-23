@@ -1,12 +1,12 @@
-import pickle
 import pandas as pd
 import numpy as np
+import joblib
 
 
 def load_model(model_path: str):
     """Loads model from binary file."""
     with open(model_path, "rb") as file:
-        model, pipeline = pickle.load(file)
+        model, pipeline = joblib.load(file)
     return model, pipeline
 
 
