@@ -122,6 +122,24 @@ Manual parameter tuning experiments can be seen in MLFlow UI. Run MLFrow using t
 Then follow the link listed under **Listening at** (for example, http://<i></i>127.0.0.1:\<port\>). After clicking on the link you will see the scoreboard with the results of the experiments. For example, the following screenshot shows the results of the experiment with **kNN** and **Random Forest Classifier**.
 ![mlflow_experiments](assets/mlflow_experiments.png)
 
+**Web-service** 
+  
+  Also you can use your models as a web service, so you can send HTTP request in otder to get the prediction:
+   ```sh
+   poetry run app <path to the model>
+  ```
+
+**Docker**
+
+  The web-servise is available as a Docker container. Firstly, build image:
+  ```sh
+    docker build -t fctclassifier .
+  ```
+  Secondly, run the container:
+   ```sh
+    docker run -it -p 9696:9696 fctclassifier:latest
+  ```
+
 ## Development
 
 * Formatting and linting project
@@ -163,14 +181,6 @@ Then follow the link listed under **Listening at** (for example, http://<i></i>1
     ```
   If all sessions were complited succesfully, you will get the following report:
 ![nox_sessions](assets/nox_sessions.png) 
-
-* Web-service 
-  
-  Also you can use your models as a web service, so you can send HTTP request in otder to get the prediction:
-   ```sh
-   poetry run app <path to the model>
-    ```
-
 
 Also this repository supports Github action, which allows linting and testing code when you commit changes.
 If there is no errors you **Action** tab will look like the following
